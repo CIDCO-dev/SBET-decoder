@@ -3,10 +3,16 @@
 
 #include "SbetProcessor.hpp"
 
+/**
+ * Create a SbetProcessor
+ */
 SbetProcessor::SbetProcessor(){
 
 }
 
+/**
+ * Destroy the SbetProcessor
+ */
 SbetProcessor::~SbetProcessor(){
 
 }
