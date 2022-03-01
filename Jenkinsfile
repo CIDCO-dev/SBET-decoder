@@ -19,7 +19,7 @@ pipeline {
   stages {
 
     stage('TEST MASTER'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make test"
       }
@@ -31,7 +31,7 @@ pipeline {
     }
 
     stage('DOCUMENTATION'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make doc"
       }
@@ -56,7 +56,7 @@ pipeline {
     }
 
     stage('BUILD MASTER'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh 'make'
         sh 'mkdir -p $binMasterPublishDir'
@@ -66,7 +66,7 @@ pipeline {
     }
 
     stage('SAVE WINDOWS EXE on SERVER'){
-      agent { label 'master' }
+      agent { label 'ubnt20-build-opensidescan-vm' }
       steps {
         sh 'mkdir -p $binWinx64PublishDir'
         sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/sbet-decoder.exe $binWinx64PublishDir/$exec_name.exe '
