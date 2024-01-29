@@ -1,4 +1,6 @@
 CC=g++
+OPTIONS=-Wall -static
+INCLUDES=-I/usr/include/eigen3 -I/usr/include/boost
 CFLAGS=-Wall
 
 default:
@@ -9,6 +11,13 @@ test: clean default
 	mkdir -p build/test/reports
 	$(CC) $(CFLAGS) -o build/test/tests test/CatchMain.cpp
 	build/test/tests -r junit -o build/test/reports/sbet-test-linux-report.xml
+	
+test-quick: default
+	mkdir -p build/test
+	mkdir -p build/test/reports
+	$(CC) $(OPTIONS) $(INCLUDES) test/CatchMain.cpp -o build/test/tests
+	build/test/tests	
+
 clean:
 	rm -rf build
 

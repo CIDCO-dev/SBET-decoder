@@ -43,10 +43,28 @@ typedef struct{
 
 class SbetProcessor{
 	public:
+                /**
+                 * Create a SbetProcessor
+                 */
 		SbetProcessor();
+                
+                /**
+                 * Destroy the SbetProcessor
+                 */
         virtual ~SbetProcessor();
 
+                /**
+                 * Read a SBET file and return true if the reading is successful
+                 * 
+                 * @param filename the name of the SBET file
+                 */
 		bool readFile(std::string & filename);
+                
+                /**
+                 * Print the information of the SbetEntry
+                 * 
+                 * @param entry The SbetEntry
+                 */
 		virtual void processEntry(SbetEntry * entry)=0;
                 virtual void done()=0;
 
