@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  linux-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and run tests
+        run: make test
+
+      - name: Upload Linux test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-test-report
+          path: build/test/reports/sbet-test-linux-report.xml
+
+      - name: Upload Linux binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binaries
+          path: |
+            build/bin/sbet-decoder
+            build/bin/accuracy-decoder
+
+  windows-build-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and run tests
+        shell: cmd
+        run: |
+          for /f "usebackq tokens=*" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath`) do set VS_INSTALL=%%i
+          call "%VS_INSTALL%\Common7\Tools\VsDevCmd.bat" -arch=x64 -host_arch=x64
+          if not exist build\bin mkdir build\bin
+          if not exist build\test\reports mkdir build\test\reports
+          cl /nologo /W4 /EHsc /std:c++14 /Fe:build\bin\sbet-decoder.exe src\sbet-decoder.cpp src\SbetProcessor.cpp
+          cl /nologo /W4 /EHsc /std:c++14 /Fe:build\bin\accuracy-decoder.exe src\accuracy-decoder.cpp
+          cl /nologo /W4 /EHsc /std:c++14 /DCATCH_CONFIG_NO_POSIX_SIGNALS /Fe:build\test\tests.exe test\CatchMain.cpp
+          build\test\tests.exe -r junit -o build\test\reports\sbet-test-windows-report.xml
+
+      - name: Upload Windows test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-report
+          path: build/test/reports/sbet-test-windows-report.xml
+
+      - name: Upload Windows binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            build/bin/sbet-decoder.exe
+            build/bin/accuracy-decoder.exe
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Generate docs
+        run: make doc
+
+      - name: Upload Doxygen output
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-output
+          path: build/doxygen

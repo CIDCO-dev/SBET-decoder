@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2017 (c) Centre Interdisciplinaire de developpement en Cartographie des Oceans (CIDCO), All rights reserved.
  */
 
 /*
@@ -11,22 +11,34 @@
 #define SBETPRINTERTEST_HPP
 
 #include "catch.hpp"
-#include <string>
-#include <sstream>
 #include <cmath>
+#include <sstream>
+#include <string>
 #include "Utils/CommandLineExecutor.hpp"
 
 double absoluteDifference(double a, double b) {
     return std::abs(a-b);
 }
 
-TEST_CASE("Accuracy Test") {
-
+std::string getAccuracyDecoderPath() {
   #ifdef _WIN32
-          std::string binexec("build\\bin\\accuracy-decoder.exe");
+    return "build\\bin\\accuracy-decoder.exe";
   #else
-          std::string binexec("build/bin/accuracy-decoder");
+    return "build/bin/accuracy-decoder";
   #endif
+}
+
+std::string getSbetDecoderPath() {
+  #ifdef _WIN32
+    return "build\\bin\\sbet-decoder.exe";
+  #else
+    return "build/bin/sbet-decoder";
+  #endif
+}
+
+TEST_CASE("accuracy decoder outputs expected first record") {
+
+    std::string binexec = getAccuracyDecoderPath();
     std::string file(" test/data/20181023accuracy.out");
 
     CommandLineExecutor exec;
@@ -70,13 +82,9 @@ TEST_CASE("Accuracy Test") {
 
 }
 
-TEST_CASE("Sbet Test") {
+TEST_CASE("sbet decoder outputs expected first record") {
 
-  #ifdef _WIN32
-          std::string binexec("build\\bin\\sbet-decoder.exe");
-  #else
-          std::string binexec("build/bin/sbet-decoder");
-  #endif
+    std::string binexec = getSbetDecoderPath();
     std::string file(" test/data/20181023.out");
 
     CommandLineExecutor exec;
@@ -133,6 +141,26 @@ TEST_CASE("Sbet Test") {
     REQUIRE(absoluteDifference(AngularRateX, 0.0) < eps);
     REQUIRE(absoluteDifference(AngularRateY, 0.0) < eps);
     REQUIRE(absoluteDifference(AngularRateZ, 0.0) < eps);
+}
+
+TEST_CASE("decoders print usage with no arguments") {
+    CommandLineExecutor exec;
+
+    std::stringstream sbetOut = exec.execute(getSbetDecoderPath());
+    REQUIRE(sbetOut.str().find("Usage: sbet-decoder input-file") != std::string::npos);
+
+    std::stringstream accuracyOut = exec.execute(getAccuracyDecoderPath());
+    REQUIRE(accuracyOut.str().find("Usage: accuracy-decoder input-file") != std::string::npos);
+}
+
+TEST_CASE("decoders report missing input file") {
+    CommandLineExecutor exec;
+
+    std::stringstream sbetOut = exec.execute(getSbetDecoderPath() + " test/data/does-not-exist.sbet 2>&1");
+    REQUIRE(sbetOut.str().find("Cannot open file") != std::string::npos);
+
+    std::stringstream accuracyOut = exec.execute(getAccuracyDecoderPath() + " test/data/does-not-exist.out 2>&1");
+    REQUIRE(accuracyOut.str().find("Cannot open file") != std::string::npos);
 }
 
 #endif /* SBETPRINTERTEST_HPP */

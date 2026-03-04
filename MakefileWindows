@@ -1,11 +1,13 @@
 
+.PHONY: default test clean doc deploy
+
 default:
 	if not exist "build\bin" mkdir build\bin
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\sbet-decoder.cpp ..\\..\\src\\SbetProcessor.cpp /EHsc /Fesbet-decoder.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\accuracy-decoder.cpp /EHsc /Feaccuracy-decoder.exe
 test: clean default
 	if not exist "build\test\reports" mkdir build\test\reports
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test &&cl ..\\..\\test\\CatchMain.cpp /EHsc /Fetests.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test &&cl ..\\..\\test\\CatchMain.cpp /EHsc /DCATCH_CONFIG_NO_POSIX_SIGNALS /Fetests.exe
 	build\test\tests.exe -r junit -o build\\test\\reports\\sbet-test-windows-x64-reports.xml
 
 clean:

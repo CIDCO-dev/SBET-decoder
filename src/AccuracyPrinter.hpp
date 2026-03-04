@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2017 (c) Centre Interdisciplinaire de developpement en Cartographie des Oceans (CIDCO), All rights reserved.
  */
 
 /* 
@@ -61,4 +61,3 @@ public:
 };
 
 #endif /* ACCURACYPRINTER_HPP */
-
